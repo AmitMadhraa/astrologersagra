@@ -1,0 +1,171 @@
+---
+import fs from 'node:fs';
+import path from 'node:path';
+import { practices } from '../data/practices';
+
+const areas = fs.readFileSync(
+  path.join(process.cwd(), 'agra-places.txt'),
+  'utf-8'
+).split('\n').filter(Boolean);
+---
+
+<nav class="bg-white shadow-lg fixed w-full top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+      <!-- Logo -->
+      <a href="/" class="flex items-center space-x-3">
+        <span class="text-2xl font-bold text-indigo-600">Agra Astro</span>
+      </a>
+
+      <!-- Desktop Navigation -->
+      <div class="hidden md:flex md:items-center md:space-x-8">
+        <!-- Home Link -->
+        <a href="/" class="text-gray-600 hover:text-indigo-600 py-2">Home</a>
+
+        <!-- Areas Dropdown -->
+        <div class="relative group">
+          <button class="flex items-center space-x-1 text-gray-600 hover:text-indigo-600 py-2">
+            <span>Areas</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          <div class="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+            <div class="py-2 max-h-96 overflow-y-auto hide-scrollbar">
+              {areas.map(area => (
+                <a
+                  href={`/areas/${area.toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '').replace(/\-+$/, '')}`}
+                  class="block px-4 py-2 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600"
+                >
+                  {area}
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <!-- Practices Dropdown -->
+        <div class="relative group">
+          <button class="flex items-center space-x-1 text-gray-600 hover:text-indigo-600 py-2">
+            <span>Practices</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          <div class="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+            <div class="py-2">
+              {practices.map(practice => (
+                <a 
+                  href={`/practices/${practice.slug}`}
+                  class="block px-4 py-2 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600"
+                >
+                  <span class="inline-block w-8">{practice.icon}</span>
+                  {practice.name}
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Link -->
+        <a href="/#contact" class="text-gray-600 hover:text-indigo-600 py-2">Contact</a>
+      </div>
+
+      <!-- Mobile menu button -->
+      <div class="md:hidden">
+        <button id="mobileMenuButton" type="button" class="text-gray-600 hover:text-indigo-600 focus:outline-none">
+          <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path id="menuIcon" class="block" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            <path id="closeIcon" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile menu -->
+  <div id="mobileMenu" class="hidden md:hidden">
+    <div class="px-4 pt-2 pb-3 space-y-1 bg-white border-t">
+      <!-- Home Link -->
+      <a href="/" class="block py-2 text-base font-medium text-gray-600 hover:text-indigo-600">
+        Home
+      </a>
+
+      <!-- Areas Section -->
+      <div class="py-2">
+        <button id="mobileAreasButton" class="flex items-center justify-between w-full text-gray-600">
+          <span class="text-base font-medium">Areas</span>
+          <svg class="w-4 h-4 transform transition-transform" id="areasArrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        <div id="mobileAreasList" class="hidden mt-2 space-y-2">
+          {areas.map(area => (
+            <a
+              href={`/areas/${area.toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '').replace(/\-+$/, '')}`}
+              class="block pl-4 py-2 text-gray-600 hover:text-indigo-600"
+            >
+              {area}
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <!-- Practices Section -->
+      <div class="py-2">
+        <button id="mobilePracticesButton" class="flex items-center justify-between w-full text-gray-600">
+          <span class="text-base font-medium">Practices</span>
+          <svg class="w-4 h-4 transform transition-transform" id="practicesArrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        <div id="mobilePracticesList" class="hidden mt-2 space-y-2">
+          {practices.map(practice => (
+            <a 
+              href={`/practices/${practice.slug}`}
+              class="block pl-4 py-2 text-gray-600 hover:text-indigo-600"
+            >
+              <span class="inline-block w-8">{practice.icon}</span>
+              {practice.name}
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <!-- Contact Link -->
+      <a href="/#contact" class="block py-2 text-base font-medium text-gray-600 hover:text-indigo-600">
+        Contact
+      </a>
+    </div>
+  </div>
+</nav>
+
+<script>
+  // Mobile menu toggle
+  const mobileMenuButton = document.getElementById('mobileMenuButton');
+  const mobileMenu = document.getElementById('mobileMenu');
+  const menuIcon = document.getElementById('menuIcon');
+  const closeIcon = document.getElementById('closeIcon');
+  const areasButton = document.getElementById('mobileAreasButton');
+  const areasList = document.getElementById('mobileAreasList');
+  const areasArrow = document.getElementById('areasArrow');
+  const practicesButton = document.getElementById('mobilePracticesButton');
+  const practicesList = document.getElementById('mobilePracticesList');
+  const practicesArrow = document.getElementById('practicesArrow');
+
+  mobileMenuButton?.addEventListener('click', () => {
+    mobileMenu?.classList.toggle('hidden');
+    menuIcon?.classList.toggle('hidden');
+    closeIcon?.classList.toggle('hidden');
+  });
+
+  areasButton?.addEventListener('click', () => {
+    areasList?.classList.toggle('hidden');
+    areasArrow?.classList.toggle('rotate-180');
+  });
+
+  practicesButton?.addEventListener('click', () => {
+    practicesList?.classList.toggle('hidden');
+    practicesArrow?.classList.toggle('rotate-180');
+  });
+</script>

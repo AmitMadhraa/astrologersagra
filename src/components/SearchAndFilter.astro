@@ -1,0 +1,133 @@
+---
+const { minFees = 0, maxFees = 10000 } = Astro.props;
+---
+
+<div class="mb-8 bg-white rounded-lg shadow-sm p-4">
+  <!-- Search Bar -->
+  <div class="relative flex items-center">
+    <input
+      type="text"
+      id="searchInput"
+      placeholder="Search by name or expertise..."
+      class="w-full px-4 py-3 pr-12 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+    />
+    <button
+      id="filterToggle"
+      class="absolute right-3 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition"
+    >
+      Filters
+    </button>
+  </div>
+
+  <!-- Filter Panel -->
+  <div id="filterPanel" class="hidden mt-4 space-y-4">
+    <!-- Fees Range -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-2">Fees Range</label>
+      <div class="flex items-center space-x-4">
+        <input
+          type="range"
+          id="feesRange"
+          min={minFees}
+          max={maxFees}
+          class="w-full"
+        />
+        <span id="feesValue" class="text-sm text-gray-600">₹{minFees}</span>
+      </div>
+    </div>
+
+    <!-- Rating Filter -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-2">Minimum Rating</label>
+      <select id="ratingFilter" class="w-full rounded-md border-gray-300">
+        <option value="0">Any Rating</option>
+        <option value="4">4+ Stars</option>
+        <option value="4.5">4.5+ Stars</option>
+      </select>
+    </div>
+
+    <!-- Languages -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-2">Languages</label>
+      <div class="space-y-2">
+        <label class="flex items-center">
+          <input type="checkbox" name="languages" value="hindi" class="rounded border-gray-300 text-indigo-600" />
+          <span class="ml-2">Hindi</span>
+        </label>
+        <label class="flex items-center">
+          <input type="checkbox" name="languages" value="english" class="rounded border-gray-300 text-indigo-600" />
+          <span class="ml-2">English</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Online/Offline -->
+    <div>
+      <label class="flex items-center">
+        <input type="checkbox" id="onlineOnly" class="rounded border-gray-300 text-indigo-600" />
+        <span class="ml-2">Online Consultation Available</span>
+      </label>
+    </div>
+  </div>
+</div>
+
+<script>
+  // DOM Elements
+  const filterToggle = document.getElementById('filterToggle');
+  const filterPanel = document.getElementById('filterPanel');
+  const searchInput = document.getElementById('searchInput');
+  const feesRange = document.getElementById('feesRange');
+  const feesValue = document.getElementById('feesValue');
+  const ratingFilter = document.getElementById('ratingFilter');
+  const languageCheckboxes = document.querySelectorAll('input[name="languages"]');
+  const onlineOnly = document.getElementById('onlineOnly');
+
+  // Toggle filter panel
+  filterToggle?.addEventListener('click', () => {
+    filterPanel?.classList.toggle('hidden');
+  });
+
+  // Update fees value display
+  feesRange?.addEventListener('input', (e) => {
+    const target = e.target as HTMLInputElement;
+    if (feesValue) {
+      feesValue.textContent = `₹${target.value}`;
+    }
+  });
+
+  // Handle search input with debounce
+  let searchTimeout: number;
+  searchInput?.addEventListener('input', (e) => {
+    const target = e.target as HTMLInputElement;
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+      // Dispatch custom event with search value
+      const event = new CustomEvent('search', { detail: target.value });
+      document.dispatchEvent(event);
+    }, 300);
+  });
+
+  // Handle filter changes
+  function handleFilterChange() {
+    const filters = {
+      fees: feesRange ? parseInt((feesRange as HTMLInputElement).value) : 0,
+      rating: ratingFilter ? parseFloat((ratingFilter as HTMLSelectElement).value) : 0,
+      languages: Array.from(languageCheckboxes)
+        .filter((cb: Element) => (cb as HTMLInputElement).checked)
+        .map((cb: Element) => (cb as HTMLInputElement).value),
+      isOnlineOnly: onlineOnly ? (onlineOnly as HTMLInputElement).checked : false,
+    };
+
+    // Dispatch custom event with filter values
+    const event = new CustomEvent('filterChange', { detail: filters });
+    document.dispatchEvent(event);
+  }
+
+  // Add change listeners to all filter inputs
+  feesRange?.addEventListener('change', handleFilterChange);
+  ratingFilter?.addEventListener('change', handleFilterChange);
+  languageCheckboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', handleFilterChange);
+  });
+  onlineOnly?.addEventListener('change', handleFilterChange);
+</script>

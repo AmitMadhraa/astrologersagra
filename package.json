@@ -1,0 +1,20 @@
+{
+  "name": "delhi-astro-connect",
+  "version": "1.0.0",
+  "description": "Lead generation site for Delhi-based astrologers",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/tailwind": "^5.1.0",
+    "astro": "^4.3.0",
+    "tailwindcss": "^3.4.1"
+  },
+  "devDependencies": {
+    "@astrojs/node": "^7.0.0"
+  }
+}

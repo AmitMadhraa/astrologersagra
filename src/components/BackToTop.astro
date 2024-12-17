@@ -1,0 +1,39 @@
+---
+---
+
+<button
+  id="backToTop"
+  class="fixed bottom-8 right-8 bg-primary-600 text-white p-3 rounded-full shadow-lg cursor-pointer opacity-0 invisible transition-all duration-300 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 z-50"
+  aria-label="Back to top"
+>
+  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+  </svg>
+</button>
+
+<script>
+  const backToTopButton = document.getElementById('backToTop');
+  
+  const toggleBackToTop = () => {
+    const scrollPosition = window.scrollY;
+    const halfPageHeight = document.documentElement.scrollHeight / 4;
+    
+    if (scrollPosition > halfPageHeight) {
+      backToTopButton?.classList.remove('opacity-0', 'invisible');
+      backToTopButton?.classList.add('opacity-100', 'visible');
+    } else {
+      backToTopButton?.classList.add('opacity-0', 'invisible');
+      backToTopButton?.classList.remove('opacity-100', 'visible');
+    }
+  };
+  
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+  
+  window.addEventListener('scroll', toggleBackToTop);
+  backToTopButton?.addEventListener('click', scrollToTop);
+</script>

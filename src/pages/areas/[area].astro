@@ -1,0 +1,36 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import AreaPractices from '../../components/AreaPractices.astro';
+import fs from 'node:fs';
+import path from 'node:path';
+
+// Get the area from URL params
+const { area } = Astro.params;
+
+// Read areas list
+const areasList = fs.readFileSync(
+  path.join(process.cwd(), 'agra-places.txt'),
+  'utf-8'
+).split('\n').filter(Boolean).map(area => area.trim());
+
+// Find the original area name (with proper casing)
+const areaName = areasList.find(a => 
+  a.toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '').replace(/\-+$/, '') === area
+);
+
+// If area not found, return 404
+if (!areaName) {
+  return new Response('Area not found', { status: 404 });
+}
+---
+
+<Layout title={`Astrology Services in ${areaName} | Delhi Astro Connect`}>
+  <main class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-2">Astrology Services in {areaName}</h1>
+    <p class="text-gray-600 mb-6">
+      Explore all types of astrological services available in {areaName}. Click on any practice to see available experts.
+    </p>
+
+    <AreaPractices areaName={areaName} />
+  </main>
+</Layout>

@@ -1,0 +1,36 @@
+---
+import { practices } from '../data/practices';
+import { astrologers } from '../data/astrologers';
+
+interface Props {
+  areaName: string;
+}
+
+const { areaName } = Astro.props;
+
+// Get count of astrologers for each practice in this area
+const practiceCounts = practices.map(practice => ({
+  ...practice,
+  expertCount: astrologers.filter(
+    a => a.area === areaName && a.practices.includes(practice.name)
+  ).length
+}));
+---
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  {practiceCounts.map(practice => (
+    <a 
+      href={`/${areaName.toLowerCase().replace(/\s+/g, '-')}/${practice.slug}`}
+      class="block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition"
+    >
+      <div class="flex items-center mb-4">
+        <span class="text-2xl mr-3">{practice.icon}</span>
+        <h2 class="text-xl font-semibold">{practice.name}</h2>
+      </div>
+      <p class="text-gray-600 mb-4">{practice.description}</p>
+      <div class="text-indigo-600">
+        {practice.expertCount} Expert{practice.expertCount !== 1 ? 's' : ''} Available
+      </div>
+    </a>
+  ))}
+</div>

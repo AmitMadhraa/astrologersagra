@@ -1,0 +1,163 @@
+---
+import type { Astrologer } from '../data/astrologers';
+import { astrologers } from '../data/astrologers';
+import areas from '../data/areas';
+
+interface Props {
+  practiceId: string;
+}
+
+const { practiceId } = Astro.props;
+
+// Group astrologers by area
+const astrologersByArea = areas.map(area => {
+  return {
+    area,
+    astrologers: astrologers.filter(
+      a => a.area === area && a.practices.includes(practiceId)
+    )
+  };
+}).filter(group => group.astrologers.length > 0);
+
+// Sort areas by number of astrologers
+astrologersByArea.sort((a, b) => b.astrologers.length - a.astrologers.length);
+---
+
+<div class="space-y-12">
+  <!-- Quick filters -->
+  <div class="bg-white rounded-xl shadow-sm p-6 sticky top-4 z-10">
+    <div class="flex flex-wrap gap-4">
+      <button class="px-4 py-2 bg-primary-100 text-primary-700 rounded-full hover:bg-primary-200 transition-colors">
+        Sort by Rating
+      </button>
+      <button class="px-4 py-2 bg-primary-100 text-primary-700 rounded-full hover:bg-primary-200 transition-colors">
+        Online Available
+      </button>
+      <button class="px-4 py-2 bg-primary-100 text-primary-700 rounded-full hover:bg-primary-200 transition-colors">
+        Price: Low to High
+      </button>
+      <button class="px-4 py-2 bg-primary-100 text-primary-700 rounded-full hover:bg-primary-200 transition-colors">
+        Experience: High to Low
+      </button>
+    </div>
+  </div>
+
+  {astrologersByArea.map(({ area, astrologers }) => (
+    <div class="bg-white rounded-xl shadow-sm p-6">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-display font-bold text-gray-900">{area}</h2>
+        <span class="text-sm text-gray-500">{astrologers.length} Expert{astrologers.length > 1 ? 's' : ''}</span>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {astrologers.map(astrologer => (
+          <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all relative">
+            {/* Online Status */}
+            {astrologer.isAvailableOnline && (
+              <div class="absolute top-4 right-4 flex items-center text-sm text-green-600">
+                <span class="w-2 h-2 bg-green-500 rounded-full mr-1"></span>
+                Online
+              </div>
+            )}
+
+            {/* Header with Image and Basic Info */}
+            <div class="flex items-center space-x-4 mb-4">
+              <div class="relative">
+                {astrologer.image ? (
+                  <img 
+                    src={astrologer.image} 
+                    alt={astrologer.name}
+                    class="w-16 h-16 rounded-full object-cover"
+                  />
+                ) : (
+                  <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center">
+                    <span class="text-2xl text-primary-600 font-semibold">
+                      {astrologer.name.charAt(0)}
+                    </span>
+                  </div>
+                )}
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-gray-900">{astrologer.name}</h3>
+                <p class="text-sm text-gray-600">{astrologer.experience}+ years experience</p>
+                <div class="flex items-center mt-1">
+                  <div class="flex items-center">
+                    <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                    </svg>
+                    <span class="ml-1 text-sm font-semibold text-gray-600">{astrologer.rating}</span>
+                    <span class="mx-2 text-gray-400">•</span>
+                    <span class="text-sm text-gray-600">{astrologer.totalConsultations.toLocaleString()}+ consultations</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Specialities */}
+            <div class="mb-4">
+              <div class="flex flex-wrap gap-2">
+                {astrologer.specialities.map(speciality => (
+                  <span class="px-2 py-1 bg-primary-50 text-primary-700 text-sm rounded-full">
+                    {speciality}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Details Grid */}
+            <div class="grid grid-cols-2 gap-4 mb-4 text-sm">
+              <div>
+                <span class="text-gray-500">Languages</span>
+                <p class="font-medium text-gray-900">{astrologer.languages.join(", ")}</p>
+              </div>
+              <div>
+                <span class="text-gray-500">Education</span>
+                <p class="font-medium text-gray-900">{astrologer.education}</p>
+              </div>
+              <div>
+                <span class="text-gray-500">Availability</span>
+                <p class="font-medium text-gray-900">{astrologer.availability}</p>
+              </div>
+              <div>
+                <span class="text-gray-500">Consultation Fee</span>
+                <p class="font-medium text-gray-900">₹{astrologer.fees}</p>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div class="flex gap-2 mt-4">
+              <a
+                href={`tel:${astrologer.phone}`}
+                class="flex-1 inline-flex items-center justify-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+              >
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                </svg>
+                Call Now
+              </a>
+              <button
+                class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                title="Save for later"
+              >
+                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  ))}
+
+  {astrologersByArea.length === 0 && (
+    <div class="text-center py-12">
+      <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+        </svg>
+      </div>
+      <h3 class="text-lg font-semibold text-gray-900 mb-2">No Astrologers Found</h3>
+      <p class="text-gray-600">Currently there are no astrologers available for this practice in any area.</p>
+    </div>
+  )}
+</div>
